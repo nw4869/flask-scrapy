@@ -2,7 +2,7 @@ __author__ = 'nightwind'
 
 from flask import render_template, flash, redirect, url_for
 from . import pj
-from ..models import Project, Item
+from ..models import Task, Tag
 from .forms import NewProjectForm
 from ..tasks import do_sth, start_crawl
 from .. import db
@@ -18,7 +18,7 @@ def index():
 
     print(task.status)
 
-    projects = Project.query.all()
+    projects = Task.query.all()
     return render_template("project/index.html", projects=projects)
 
 
@@ -31,7 +31,7 @@ def new_project():
         start_crawl.delay(name, [url])
         # start_simple_crawl.delay(name, [url])
         # start_crawl('baidu', ['http://baidu.com'])
-        project = Project(name=form.name.data)
+        project = Task(name=form.name.data)
         db.session.add(project)
         db.session.commit()
         flash('ok!')
