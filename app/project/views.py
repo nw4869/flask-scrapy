@@ -1,13 +1,15 @@
+from billiard import Process
+
 __author__ = 'nightwind'
 
 from flask import render_template, flash, redirect, url_for
 from . import pj
 from ..models import Task, Tag
 from .forms import NewProjectForm
-from ..tasks import do_sth, start_crawl
+from ..tasks import do_sth, start_crawl, start_my_crawl
 from .. import db
 from time import sleep
-
+from ..crawler import MyCrawlSpider, MyCrawlSpiderBuilder
 
 @pj.route('/')
 def index():
@@ -28,7 +30,13 @@ def new_project():
     if form.validate_on_submit():
         name = str(form.name.data)
         url = str(form.url.data)
-        start_crawl.delay(name, [url])
+
+        builder = MyCrawlSpiderBuilder(name).add_start_url(url)
+        start_my_crawl.delay(builder)
+        # start_my_crawl(builder)
+        # Process(target=start_my_crawl, args=(builder, )).start()
+
+        # start_crawl.delay(name, [url])
         # start_simple_crawl.delay(name, [url])
         # start_crawl('baidu', ['http://baidu.com'])
         project = Task(name=form.name.data)

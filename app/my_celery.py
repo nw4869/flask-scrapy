@@ -2,8 +2,9 @@ __author__ = 'nightwind'
 
 from flask import Flask, jsonify
 from celery import Celery
-from crawler import MySpiderProcess
+from crawler import MySpiderProcess1, MyCrawlSpider
 from flask.ext.script import Manager, Shell
+from scrapy.crawler import CrawlerProcess
 
 app = Flask(__name__)
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
@@ -26,8 +27,15 @@ def my_background_task(arg1, arg2):
 
 @celery.task(name='app.my_celery.start_crawl')
 def start_crawl(name, urls):
-    MySpiderProcess(name, urls).start()
+    MySpiderProcess1(name, urls).start()
     print('my spider started')
+
+
+@celery.task
+def start_my_crawl(builder):
+    process = CrawlerProcess()
+    process.crawl(MyCrawlSpider, builder)
+    process.start()
 
 
 @app.route('/')
@@ -36,9 +44,9 @@ def index():
     # start_crawl('baidu', ['http://baidu.com'])
     # start_crawl.delay('baidu', ['http://baidu.com'])
     # for i in range(5):
-        # start_crawl('baidu', ['http://baidu.com'])
-        # start_crawl('baidu', ['http://baidu.com'])
-        # MySpider('baidu', ['http://baidu.com']).start()
+    # start_crawl('baidu', ['http://baidu.com'])
+    # start_crawl('baidu', ['http://baidu.com'])
+    # MySpider('baidu', ['http://baidu.com']).start()
     return jsonify({'result': 'ok'})
 
 
