@@ -6,7 +6,7 @@ from flask import render_template, flash, redirect, url_for
 from . import pj
 from ..models import Task, Tag
 from .forms import NewProjectForm
-from ..tasks import do_sth, start_crawl, start_my_crawl
+from ..tasks import do_sth, start_crawl, start_my_crawl, start_my_crawl_dict
 from .. import db
 from time import sleep
 from ..crawler import MyCrawlSpider, MyCrawlSpiderBuilder
@@ -32,7 +32,9 @@ def new_project():
         url = str(form.url.data)
 
         builder = MyCrawlSpiderBuilder(name).add_start_url(url)
-        start_my_crawl.delay(builder)
+        # start_my_crawl.delay(builder)
+        start_my_crawl_dict.delay(builder.to_dict())
+
         # start_my_crawl(builder)
         # Process(target=start_my_crawl, args=(builder, )).start()
 
@@ -45,7 +47,7 @@ def new_project():
         flash('ok!')
 
         # start_crawl('asdf', 'http://baidu.com')
-        do_sth()
+        do_sth.delay()
 
         return redirect(url_for('project.new_project'))
     return render_template('project/newProject.html', form=form)

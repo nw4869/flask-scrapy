@@ -111,6 +111,14 @@ class MyCrawlSpiderBuilder:
     def build(self):
         return MyCrawlSpider(self.name, self.start_urls, self.rules)
 
+    def to_dict(self):
+        return {'name': self.name, 'start_urls': self.start_urls, 'rules': self.rules}
+
+    def from_dict(self, builder_dict):
+        self.name = builder_dict['name']
+        self.start_urls = builder_dict['start_urls']
+        self.rules = builder_dict['rules']
+
 
 if __name__ == '__main__':
     # MySpiderProcess('asdf', ['http://baidu.com']).start()

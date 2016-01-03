@@ -1,11 +1,9 @@
 __author__ = 'nightwind'
 
-from celery import Celery
-from config import Config
+# from celery import Celery
+from app import celery
 from scrapy.crawler import CrawlerProcess
-from crawler import MySpiderProcess1, MyCrawlSpider
-
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
+from crawler import MySpiderProcess1, MyCrawlSpider, MyCrawlSpiderBuilder
 
 
 @celery.task
@@ -26,3 +24,10 @@ def start_my_crawl(builder):
     process = CrawlerProcess()
     process.crawl(MyCrawlSpider, builder=builder)
     process.start()
+
+
+@celery.task
+def start_my_crawl_dict(builder_dict):
+    builder = MyCrawlSpiderBuilder(builder_dict['name'])
+    builder.from_dict(builder_dict)
+    start_my_crawl(builder)
