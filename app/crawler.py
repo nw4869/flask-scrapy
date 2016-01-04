@@ -1,3 +1,5 @@
+from scrapy.settings import Settings
+
 __author__ = 'nightwind'
 
 import scrapy
@@ -25,7 +27,11 @@ class MySpiderProcess1(scrapy.Spider):
         print('parse response')
 
     def _crawl(self):
-        self.process = CrawlerProcess()
+        settings = Settings()
+        settings.set('ITEM_PIPELINES', {
+            'app.pipelines.JsonWriterPipeline': 300
+        })
+        self.process = CrawlerProcess(settings)
         self.process.crawl(self, self.name, self.start_urls)
         self.process.start()
         # self.process.stop()
