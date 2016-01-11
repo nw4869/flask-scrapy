@@ -45,4 +45,5 @@ class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String, nullable=True)
+    url = db.Column(db.String)
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'))

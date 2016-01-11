@@ -5,7 +5,7 @@
         <h1>Hello, World!</h1>
     </div>
     <table class="table table-striped">
-        <caption>Projects</caption>
+        <caption>Tasks</caption>
         <thead>
         <tr>
             <th>id</th>
@@ -14,16 +14,16 @@
         </tr>
         </thead>
         <tbody>
-        {% for project in projects %}
+        {% for task in tasks %}
             <tr>
-                <td>{{ project.id }}</td>
-                <td>{{ project.name }}</td>
-                <td>{{ project.status }}</td>
+                <td>{{ task.id }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.status }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <p>
-        <a href="{{ url_for('project.new_project') }}">New Project</a>
+        <a href="{{ url_for('task.new_task') }}">New Task</a>
     </p>
 {% endblock %}

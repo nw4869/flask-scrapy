@@ -6,14 +6,16 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from celery import Celery
 from config import config, Config
 import celery_config
+import custom_error_pages
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 # celery = Celery(__name__, broker='redis://localhost:6379/0')
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
+# celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
+celery = Celery(__name__)
 celery.config_from_object('app.celery_config')
 
-from project.views import do_sth
+from task.views import do_sth
 
 
 def create_app(config_name):
@@ -29,7 +31,10 @@ def create_app(config_name):
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .project import pj as project_blueprint
-    app.register_blueprint(project_blueprint, url_prefix='/project')
+    from .task import task as task_blueprint
+    app.register_blueprint(task_blueprint, url_prefix='/task')
+
+    app.error_handler_spec[None][404] = custom_error_pages.page_not_found
+    app.error_handler_spec[None][500] = custom_error_pages.internal_server_error
 
     return app

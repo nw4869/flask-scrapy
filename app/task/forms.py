@@ -5,7 +5,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 
-class NewProjectForm(Form):
+class NewTaskForm(Form):
     name = StringField('Name', validators=[DataRequired(), Length(1, 64)])
     url = StringField('Url', validators=[DataRequired(), Length(1, 64)])
     submit = SubmitField('Submit')
