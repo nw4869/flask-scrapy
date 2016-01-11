@@ -2,15 +2,15 @@
 
 {% block page_content %}
     <div class="page-header">
-        <h1>Hello, World!</h1>
+        <h2>任务</h2>
     </div>
     <table class="table table-striped">
-        <caption>Tasks</caption>
+        <caption>任务列表</caption>
         <thead>
         <tr>
             <th>id</th>
-            <th>name</th>
-            <th>status</th>
+            <th>任务名</th>
+            <th>状态</th>
         </tr>
         </thead>
         <tbody>
@@ -18,12 +18,12 @@
             <tr>
                 <td>{{ task.id }}</td>
                 <td>{{ task.name }}</td>
-                <td>{{ task.status }}</td>
+                <td>{{ '完成' if task.status == 1 else '未完成' }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <p>
-        <a href="{{ url_for('task.new_task') }}">New Task</a>
+        <a href="{{ url_for('task.new_task') }}">新建任务</a>
     </p>
 {% endblock %}

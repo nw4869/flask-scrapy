@@ -13,12 +13,15 @@ class Config:
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL') or "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND') or "redis://localhost:6379/0"
 
+    BABEL_DEFAULT_LOCALE = 'zh_Hans_CN'
+
     @staticmethod
     def init_app(app):
         pass
 
 
 class DevelopmentConfig(Config):
+    # WTF_CSRF_ENABLED = False
     DEBUG = True
     # DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \

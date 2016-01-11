@@ -8,10 +8,14 @@ from flask.ext.migrate import Migrate, MigrateCommand
 from app import celery
 from celery.bin import worker
 from celery.bin.celery import main as celery_main
+from flask.ext.babel import Babel
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
+babel = Babel(app)
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
+
 
 
 def make_shell_context():

@@ -11,6 +11,7 @@ from .. import db
 from time import sleep
 from ..crawler import MyCrawlSpider, MyCrawlSpiderBuilder
 
+
 @task.route('/')
 def index():
     # start_crawl.delay('baidu', ['http://baidu.com'])

@@ -1,13 +1,92 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}New Task{% endblock %}
+{% block title %}新建任务{% endblock %}
 
 {% block page_content %}
     <div class="page-header">
-        <h1>New Task</h1>
+        <h2>新建任务</h2>
     </div>
-    <div class="col-md-4">
-        {{ wtf.quick_form(form) }}
-    </div>
+
+{#    <form method="post">#}
+{#    {{ form.csrf_token }}#}
+{#    {{ form.name }}#}
+{#    {{ form.url }}#}
+{#    {{ form.rule1 }}#}
+{#    {{ form.submit }}#}
+{#    </form>#}
+
+{#    {{ wtf.quick_form(form) }}#}
+    <form action method="post" role="form" class="form-horizontal">
+        {{ form.csrf_token }}
+{#        {{form.hidden_tag()}}#}
+        <div class="form-group">
+            {{ form.name.label(class="control-label col-xs-1") }}
+            <div class="col-xs-4">
+                {{ form.name(class="form-control") }}
+            </div>
+        </div>
+
+
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab1" data-toggle="tab">网址采集规则</a></li>
+                <li><a href="#tab2" data-toggle="tab">内容采集规则</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <br/>
+
+                    <div class="form-group">
+                        {{ form.url.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.url(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.link_exclude.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.link_exclude(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.link_include.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.link_include(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <br/>
+
+                    <div class="form-group">
+                        {{ form.rule1.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.rule1(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.content_exclude.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.content_include(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.content_include.label(class="control-label col-sm-1") }}
+                        <div class="col-sm-4">
+                            {{ form.content_include(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10">
+                {{ form.submit(class="btn btn-default") }}
+            </div>
+        </div>
+
+    </form>
+
 {% endblock %}
