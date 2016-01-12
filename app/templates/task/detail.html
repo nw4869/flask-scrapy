@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h2>{{ task.name }}</h2>
+    </div>
+    <p>欢迎使用!</p>
+    <p>
+        {% for url in task.urls.all() %}
+            <p>{{ url.rule1 }}</p>
+        {% endfor %}
+{% endblock %}

@@ -4,7 +4,7 @@ __author__ = 'nightwind'
 
 from flask import render_template, flash, redirect, url_for
 from . import task
-from ..models import Task, Tag
+from ..models import Task, Tag, Url
 from .forms import NewTaskForm
 from ..tasks import do_sth, start_crawl, start_my_crawl, start_my_crawl_dict
 from .. import db
@@ -25,6 +25,11 @@ def index():
     return render_template("task/index.html", tasks=tasks)
 
 
+@task.route('/id/<task_id>')
+def detail(task_id):
+    return render_template('task/detail.html', task=db.session.query(Task).filter(Task.id==task_id).first())
+
+
 @task.route('/new_task', methods=['GET', 'POST'])
 def new_task():
     form = NewTaskForm()
@@ -43,12 +48,16 @@ def new_task():
         # start_simple_crawl.delay(name, [url])
         # start_crawl('baidu', ['http://baidu.com'])
         task = Task(name=form.name.data)
+        url = Url(rule1=form.url.data)
+        tag = Tag(name=form.content_name.data, rule1=form.content_rule1.data)
+        task.urls.append(url)
+        task.tags.append(tag)
         db.session.add(task)
         db.session.commit()
         flash('ok!')
 
         # start_crawl('asdf', 'http://baidu.com')
-        do_sth.delay()
+        # do_sth.delay()
 
         return redirect(url_for('task.new_task'))
     return render_template('task/newTask.html', form=form)

@@ -2,7 +2,7 @@ __author__ = 'nightwind'
 
 import os
 from app import create_app, db
-from app.models import Task, Tag
+from app.models import Task, Tag, Url
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
 from app import celery
@@ -19,7 +19,7 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
 
 
 def make_shell_context():
-    return dict(app=app, db=db, Task=Task, Item=Tag)
+    return dict(app=app, db=db, Task=Task, Item=Tag, Url=Url)
 
 
 manager.add_command("shell", Shell(make_shell_context()))

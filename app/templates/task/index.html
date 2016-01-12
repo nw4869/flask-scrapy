@@ -19,6 +19,7 @@
                 <td>{{ task.id }}</td>
                 <td>{{ task.name }}</td>
                 <td>{{ '完成' if task.status == 1 else '未完成' }}</td>
+                <td><a href="{{ url_for('task.detail', task_id=task.id) }}">查看详情</a> </td>
             </tr>
         {% endfor %}
         </tbody>

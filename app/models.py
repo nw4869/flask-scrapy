@@ -26,6 +26,7 @@ class Url(db.Model):
     exclude = db.Column(db.String, nullable=True)
     include = db.Column(db.String, nullable=True)
     task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
+    # task = db.relationship(Task, 'urls', backref=db.backref('task', useList=True), lazy='dynamic')
 
 
 class Tag(db.Model):
