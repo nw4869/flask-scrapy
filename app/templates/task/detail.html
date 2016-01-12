@@ -4,9 +4,58 @@
     <div class="page-header">
         <h2>{{ task.name }}</h2>
     </div>
-    <p>欢迎使用!</p>
-    <p>
-        {% for url in task.urls.all() %}
-            <p>{{ url.rule1 }}</p>
-        {% endfor %}
+{#    <p>欢迎使用!</p>#}
+{#    <p>#}
+{#        {% for url in task.urls.distinct() %}#}
+{#            <p>{{ url.rule1 }}</p>#}
+{#        {% endfor %}#}
+
+    <table class="table table-striped">
+        <caption>任务结果</caption>
+        <thead>
+        <tr>
+            <th class="col-sm-1">序号</th>
+            {% for tag in task.tags.all() %}
+                <th class="col-sm-2">{{  tag.name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td><a href="#">产品经理王撕葱</a></td>
+            <td><a href="#">还记得跟林努斯经常吵架的那个产品经理么？他叫王撕葱。
+
+作为产品经理，哦，他当时是助理产品经理，王撕葱确实是经常跟程序员们争吵。如程序员们所知，吵架已经成...</a></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td><a href="#">情怀仍是营销最佳手段？</a></td>
+            <td><a href="#">文/叶小舟
+
+“我不是为了输赢，我就是认真”
+
+“我所有的向往”
+
+“永远相信美好的事情即将发生”
+
+“让世界爱上中国造”
+
+“让我们一起，为梦想窒息”
+
+乍一看上面略带信仰的口号，...</a></td>
+        </tr>
+{#        {% if task.tags.first() is not none %}#}
+{#            {% for item in tasks.tags.first().items.all() %}#}
+{#                <tr>#}
+{#                    <td>{{ task.id }}</td>#}
+{#                    <td>{{ task.name }}</td>#}
+{#                    <td>{{ '完成' if task.status == 1 else '就绪' }}</td>#}
+{#                    <td><a href="#">启动</a></td>#}
+{#                    <td><a href="{{ url_for('task.detail', task_id=task.id) }}">查看详情</a></td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#        {% endif %}#}
+        </tbody>
+    </table>
 {% endblock %}
