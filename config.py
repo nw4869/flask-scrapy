@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'nightwind'
 import os
 
@@ -26,6 +27,8 @@ class DevelopmentConfig(Config):
     # DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
                               'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    # 加载bootstrap本地css与js文件
+    BOOTSTRAP_SERVE_LOCAL = True
 
 
 class TestingConfig(Config):
