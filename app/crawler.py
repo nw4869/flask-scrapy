@@ -3,7 +3,7 @@ from scrapy.settings import Settings
 __author__ = 'nightwind'
 
 import scrapy
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerProcess, Crawler
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from billiard import Process
@@ -91,12 +91,57 @@ class MyCrawlSpider(CrawlSpider):
         if builder is not None:
             self.name = builder.name
             self.start_urls = builder.start_urls
-            self.rules = builder.rules
+            self.pre_rules = builder.rules
+            self.tags = builder.tags
         else:
             self.name = name
             self.start_urls = start_urls
-            self.rules = rules
+            self.pre_rules = rules
+        self.__init_rules()
         super(MyCrawlSpider, self).__init__(*a, **kw)
+
+    def __init_rules(self):
+        rules = []
+        print('***********rules:', self.pre_rules)
+        for rule in self.pre_rules:
+            url = rule[0].encode('utf-8')
+            follow = rule[1]
+            if follow:
+                rules.append(Rule(LinkExtractor(allow=(url,)), callback='parse_item'))
+                print('*********add url', url)
+            else:
+                rules.append(Rule(LinkExtractor(deny=(url,))))
+        self.rules = tuple(rules)
+        print('**************rules:', self.rules)
+
+    def parse_item(self, response):
+        print('*********parse_item ... for ', response)
+        # print('******response.body', response.body.decode(response.encoding))
+        item = MyItem()
+        # item['test_key'] = 'test_vaule'
+        # data = response.decode(response.encoding)
+
+        # TODO fix encode and regex
+
+        item['url'] = response.url.encode('utf-8')
+        item['my_item'] = []
+        print('*********tags', self.tags)
+        for tag in self.tags:
+            data = response.selector.re(tag[1])
+            try:
+                data = data[0]
+            except:
+                pass
+            print('***********data', data)
+            if not data:
+                data = u''
+            item['my_item'].append((tag[0], data.encode('utf-8')))
+        return item
+
+
+class MyItem(scrapy.Item):
+    my_item = scrapy.Field()
+    url = scrapy.Field()
 
 
 class MyCrawlSpiderBuilder:
@@ -104,26 +149,30 @@ class MyCrawlSpiderBuilder:
         self.name = name
         self.start_urls = []
         self.rules = []
+        self.tags = []
 
     def add_start_url(self, url):
         self.start_urls.append(url)
         return self
 
+    def add_tags(self, tag_id, rule1):
+        self.tags.append((tag_id, rule1))
+
     def add_link_rule(self, url, follow=True):
-        if follow:
-            self.rules.append(Rule(LinkExtractor(allow=(url,))))
+        self.rules.append((url, follow))
         return self
 
     def build(self):
         return MyCrawlSpider(self.name, self.start_urls, self.rules)
 
     def to_dict(self):
-        return {'name': self.name, 'start_urls': self.start_urls, 'rules': self.rules}
+        return {'name': self.name, 'start_urls': self.start_urls, 'rules': self.rules, 'tags': self.tags}
 
     def from_dict(self, builder_dict):
         self.name = builder_dict['name']
         self.start_urls = builder_dict['start_urls']
         self.rules = builder_dict['rules']
+        self.tags = builder_dict['tags']
 
 
 if __name__ == '__main__':

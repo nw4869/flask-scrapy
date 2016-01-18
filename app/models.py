@@ -12,8 +12,8 @@ class Task(db.Model):
     proxy = db.Column(db.String, nullable=True)
     thread_num = db.Column(db.Integer, default=1)
     delay_ms = db.Column(db.Integer, default=-1)
-    urls = db.relationship('Url', backref='task', lazy='dynamic')
-    tags = db.relationship('Tag', backref='task', lazy='dynamic')
+    urls = db.relationship('Url', backref='task', lazy='dynamic', cascade="all, delete-orphan")
+    tags = db.relationship('Tag', backref='task', lazy='dynamic', cascade="all, delete-orphan")
 
 
 class Url(db.Model):
@@ -38,7 +38,7 @@ class Tag(db.Model):
     exclude = db.Column(db.String, nullable=True)
     include = db.Column(db.String, nullable=True)
     type = db.Column(db.Integer, default=0)
-    items = db.relationship('Item', backref='tag', lazy='dynamic')
+    items = db.relationship('Item', backref='tag', lazy='dynamic', cascade="all, delete-orphan")
     task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
 
 

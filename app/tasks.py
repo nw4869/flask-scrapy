@@ -2,7 +2,7 @@ __author__ = 'nightwind'
 
 # from celery import Celery
 from app import celery
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerProcess, Settings
 from crawler import MySpiderProcess1, MyCrawlSpider, MyCrawlSpiderBuilder
 
 
@@ -21,9 +21,17 @@ def do_sth():
 
 @celery.task
 def start_my_crawl(builder):
-    process = CrawlerProcess()
+    settings = Settings()
+    # settings.set('DEPTH_LIMIT', 1)
+    settings.set("ITEM_PIPELINES", {
+        # 'app.pipelines.JsonWriterPipeline': 200,
+        'app.pipelines.DataBasePipeline': 300,
+    })
+
+    process = CrawlerProcess(settings)
     process.crawl(MyCrawlSpider, builder=builder)
     process.start()
+    process.stop()
 
 
 @celery.task

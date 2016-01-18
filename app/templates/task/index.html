@@ -11,16 +11,19 @@
             <th>id</th>
             <th>任务名</th>
             <th>状态</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
         {% for task in tasks %}
             <tr>
                 <td>{{ task.id }}</td>
-                <td>{{ task.name }}</td>
+                <td>
+                    <a href="{{ url_for('task.detail', task_id=task.id) }}">{{ task.name }}</a></td>
                 <td>{{ '完成' if task.status == 1 else '就绪' }}</td>
-                <td><a href="#">启动</a> </td>
-                <td><a href="{{ url_for('task.detail', task_id=task.id) }}">查看详情</a> </td>
+                <td><a href="{{ url_for('task.start', task_id=task.id) }}">启动</a>
+{#                    / <a href="{{ url_for('task.detail', task_id=task.id) }}">查看详情</a>#}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

@@ -6,6 +6,34 @@
     </div>
 
     <table class="table table-striped">
+        <caption>标签列表</caption>
+        <thead>
+        <tr>
+            <th class="col-sm-1">序号</th>
+            <th class="col-sm-1">名称</th>
+            <th class="col-sm-2">规则</th>
+            <th class="col-sm-1">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for i in range(tags_count) %}
+            <tr>
+                <td>{{ i + 1 }}</td>
+                <td> {{ tags[i].name }} </td>
+                <td> {{ tags[i].rule1 }} </td>
+                <td><a href="{{ url_for('task.remove_tag', task_id=task.id, tag_id=tags[i].id) }}">删除</a> </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('task.new_tag', task_id=task.id) }}">添加标签</a>
+
+    <hr>
+
+
+    <table class="table table-striped">
         <caption>任务结果</caption>
         <thead>
         <tr>
@@ -13,6 +41,7 @@
             {% for tag in tags %}
                 <th class="col-sm-2">{{ tag.name }}</th>
             {% endfor %}
+            <th class="col-sm-2">来源</th>
         </tr>
         </thead>
         <tbody>
@@ -22,9 +51,10 @@
                 <td>{{ i + 1 }}</td>
                 {% for item in item_lists_per_url[i] %}
                     <td>
-                        <a href="{{ url_for('task.item_detail', task_id=task.id, item_id=item.id) }}">{{ item.data[:100] }}</a>
+                        <a href="{{ url_for('task.item_detail', task_id=task.id, item_id=item.id) }}">{{ item.data[:100] if item is not none }}</a>
                     </td>
                 {% endfor %}
+                <td><a href="{{ urls[i] }}">{{ urls[i][:100] }}</a></td>
             </tr>
         {% endfor %}
         </tbody>
