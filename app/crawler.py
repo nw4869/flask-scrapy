@@ -7,6 +7,7 @@ from scrapy.crawler import CrawlerProcess, Crawler
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from billiard import Process
+import re
 
 
 class MySpider1(scrapy.Spider):
@@ -126,16 +127,19 @@ class MyCrawlSpider(CrawlSpider):
         item['url'] = response.url.encode('utf-8')
         item['my_item'] = []
         print('*********tags', self.tags)
+        result = response.body
         for tag in self.tags:
-            data = response.selector.re(tag[1])
             try:
-                data = data[0]
+                result = re.search(tag[1], result, re.DOTALL)
+                print('result = ',result.group())
+                if result is not None:
+                    result = result.group().encode('utf-8')
+                else:
+                    result = ''
+                print('***********data', result)
             except:
-                pass
-            print('***********data', data)
-            if not data:
-                data = u''
-            item['my_item'].append((tag[0], data.encode('utf-8')))
+                result = ''
+            item['my_item'].append((tag[0], result.encode('utf-8')))
         return item
 
 
