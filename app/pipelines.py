@@ -1,5 +1,6 @@
 import json
-from app import db
+# from app import db
+from manage import db
 from app.models import Item
 
 

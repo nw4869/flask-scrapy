@@ -127,8 +127,8 @@ def remove_tag(task_id, tag_id):
 def new_task():
     form = NewTaskForm()
     if form.validate_on_submit():
-        name = str(form.name.data)
-        url = str(form.url.data)
+        name = form.name.data #.encode('utf-8')
+        url = form.url.data  #.encode('utf-8')
 
         builder = MyCrawlSpiderBuilder(name).add_start_url(url)
         # start_my_crawl.delay(builder)

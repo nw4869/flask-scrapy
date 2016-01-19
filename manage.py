@@ -41,6 +41,8 @@ def test():
 
 @manager.command
 def celeryd():
+    db.init_app(app)
+
     # celery_app = current_app._get_current_object()
     celery_app = celery
 

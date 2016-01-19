@@ -130,12 +130,13 @@ class MyCrawlSpider(CrawlSpider):
         result = response.body
         for tag in self.tags:
             try:
-                result = re.search(tag[1], result, re.DOTALL)
-                print('result = ',result.group())
+                result = re.search(tag[1], result, re.S|re.U)
                 if result is not None:
+                    print('result = ',result.group())
                     result = result.group().encode('utf-8')
                 else:
                     result = ''
+                    print('result is none')
                 print('***********data', result)
             except:
                 result = ''
