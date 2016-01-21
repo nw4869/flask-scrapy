@@ -30,8 +30,7 @@ def index():
 def item_detail(task_id, item_id):
     # TODO 待完善
     try:
-        # TODO 为什么过滤task无效
-        item = Item.query.join(Tag).filter(Tag.task_id == task_id).filter(Item.id == item_id).one()
+        item = Item.query.join(Tag).filter(Tag.task_id == task_id, Item.id == item_id).one()
         return item.data
     except:
         pass
@@ -66,6 +65,10 @@ def detail(task_id):
         abort(404)
     tags = Tag.query.filter(Tag.task == task).all()
 
+    start_urls = Url.query.filter(Url.task == task, Url.type == 0).all()
+
+    link_rules = Url.query.filter(Url.task == task, Url.type != 0).all()
+
     all_items = Item.query.join(Tag).filter(Tag.task == task).order_by(Item.url).all()
 
     # make item-dicts per url
@@ -92,8 +95,8 @@ def detail(task_id):
         item_lists_per_url.append(items_list)
     # print(item_lists_per_url)
 
-    return render_template('task/detail.html', task=task, tags=tags, item_lists_per_url=item_lists_per_url,
-                           items_count=len(item_lists_per_url), tags_count=len(tags), urls=urls)
+    return render_template('task/detail.html', task=task, tags=tags, item_lists_per_url=item_lists_per_url, urls=urls,
+                           start_urls=start_urls, link_rules=link_rules)
 
 
 @task.route('/id/<task_id>/new_tag', methods=['GET', 'POST'])
@@ -127,8 +130,8 @@ def remove_tag(task_id, tag_id):
 def new_task():
     form = NewTaskForm()
     if form.validate_on_submit():
-        name = form.name.data #.encode('utf-8')
-        url = form.url.data  #.encode('utf-8')
+        name = form.name.data  # .encode('utf-8')
+        url = form.url.data  # .encode('utf-8')
 
         builder = MyCrawlSpiderBuilder(name).add_start_url(url)
         # start_my_crawl.delay(builder)

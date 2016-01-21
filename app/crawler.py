@@ -127,20 +127,21 @@ class MyCrawlSpider(CrawlSpider):
         item['url'] = response.url.encode('utf-8')
         item['my_item'] = []
         print('*********tags', self.tags)
-        result = response.body
+        html_doc = response.body.decode('utf-8')
         for tag in self.tags:
             try:
-                result = re.search(tag[1], result, re.S|re.U)
+                result = re.search(tag[1], html_doc, re.S|re.U)
                 if result is not None:
                     print('result = ',result.group())
-                    result = result.group().encode('utf-8')
+                    result = result.group()
                 else:
                     result = ''
                     print('result is none')
                 print('***********data', result)
-            except:
+            except :
                 result = ''
-            item['my_item'].append((tag[0], result.encode('utf-8')))
+            # item['my_item'].append((tag[0], result.encode('utf-8')))
+            item['my_item'].append((tag[0], result))
         return item
 
 

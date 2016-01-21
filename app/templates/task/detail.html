@@ -4,6 +4,47 @@
     <div class="page-header">
         <h2>{{ task.name }}</h2>
     </div>
+    <a href="{{ url_for('task.start', task_id=task.id) }}">启动任务</a>
+
+    <table class="table table-striped">
+        <caption>起始链接</caption>
+        <thead>
+        <tr>
+            <th class="col-sm-1">序号</th>
+            <th class="col-sm-2">链接</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in range(start_urls|count) %}
+            <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ start_urls[i].rule1 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <table class="table table-striped">
+        <caption>链接规则</caption>
+        <thead>
+        <tr>
+            <th class="col-sm-1">序号</th>
+            <th class="col-sm-2">规则</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in range(link_rules|count) %}
+            <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ link_rules[i].rule1 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
 
     <table class="table table-striped">
         <caption>标签列表</caption>
@@ -17,17 +58,16 @@
         </thead>
         <tbody>
 
-        {% for i in range(tags_count) %}
+        {% for i in range(tags|count) %}
             <tr>
                 <td>{{ i + 1 }}</td>
                 <td> {{ tags[i].name }} </td>
                 <td> {{ tags[i].rule1 }} </td>
-                <td><a href="{{ url_for('task.remove_tag', task_id=task.id, tag_id=tags[i].id) }}">删除</a> </td>
+                <td><a href="{{ url_for('task.remove_tag', task_id=task.id, tag_id=tags[i].id) }}">删除</a></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
     <a href="{{ url_for('task.new_tag', task_id=task.id) }}">添加标签</a>
 
     <hr>
@@ -46,7 +86,7 @@
         </thead>
         <tbody>
 
-        {% for i in range(items_count) %}
+        {% for i in range(item_lists_per_url|count) %}
             <tr>
                 <td>{{ i + 1 }}</td>
                 {% for item in item_lists_per_url[i] %}
