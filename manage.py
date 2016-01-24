@@ -52,6 +52,7 @@ def celeryd():
         # 'broker': 'amqp://guest:guest@localhost:5672//',
         # 'loglevel': 'INFO',
         # 'traceback': True,
+        # 'concurrency': 0
     }
 
     celery_worker.run(**options)

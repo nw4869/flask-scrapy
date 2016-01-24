@@ -130,12 +130,12 @@ def remove_tag(task_id, tag_id):
 def new_task():
     form = NewTaskForm()
     if form.validate_on_submit():
-        name = form.name.data  # .encode('utf-8')
-        url = form.url.data  # .encode('utf-8')
+        # name = form.name.data  # .encode('utf-8')
+        # url = form.url.data  # .encode('utf-8')
 
-        builder = MyCrawlSpiderBuilder(name).add_start_url(url)
+        # builder = MyCrawlSpiderBuilder(name).add_start_url(url)
         # start_my_crawl.delay(builder)
-        start_my_crawl_dict.delay(builder.to_dict())
+        # start_my_crawl_dict.delay(builder.to_dict())
 
         # start_my_crawl(builder)
         # Process(target=start_my_crawl, args=(builder, )).start()

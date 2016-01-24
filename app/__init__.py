@@ -11,8 +11,8 @@ import custom_error_pages
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 # celery = Celery(__name__, broker='redis://localhost:6379/0')
-# celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
-celery = Celery(__name__)
+celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
+# celery = Celery(__name__)
 celery.config_from_object('app.celery_config')
 
 from task.views import do_sth
@@ -27,10 +27,10 @@ def create_app(config_name):
 
     bootstrap.init_app(app)
     db.init_app(app)
-    with app.app_context():
+    # with app.app_context():
         # Extensions like Flask-SQLAlchemy now know what the "current" app
         # is while within this block. Therefore, you can now run........
-        db.create_all()
+        # db.create_all()
 
 
     from .main import main as main_blueprint

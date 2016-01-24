@@ -10,6 +10,7 @@
     <form action method="post" role="form" class="form-horizontal">
         {{ form.csrf_token }}
 
+        {# 名称 #}
         <div class="form-group">
             {{ form.name.label(class="control-label col-sm-1") }}
             <div class="col-sm-4">
@@ -17,6 +18,15 @@
             </div>
         </div>
 
+        {# 类型 #}
+        <div class="form-group">
+            {{ form.type.label(class="control-label col-sm-1") }}
+            <div class="col-sm-4">
+                {{ with_errors(form.type, class="form-control") }}
+            </div>
+        </div>
+
+        {#规则1#}
         <div class="form-group">
             {{ form.rule1.label(class="control-label col-sm-1") }}
             <div class="col-sm-4">

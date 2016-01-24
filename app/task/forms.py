@@ -2,8 +2,8 @@
 __author__ = 'nightwind'
 
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, SubmitField, BooleanField, IntegerField, SelectField
+from wtforms.validators import DataRequired, Length, NumberRange
 
 
 class NewTaskForm(Form):
@@ -18,5 +18,7 @@ class NewTaskForm(Form):
 
 class NewTagForm(Form):
     name = StringField(u'标签名', validators=[DataRequired(), Length(1, 255)])
+    type = IntegerField(u'类型', validators=[DataRequired(), NumberRange(0, 1)], default=0)
+    # type = SelectField(u'类型')
     rule1 = StringField(u'规则', validators=[DataRequired(), Length(1, 255)])
     submit = SubmitField(u'提交')
