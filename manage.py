@@ -1,11 +1,10 @@
 __author__ = 'nightwind'
 
 import os
-from app import create_app, db
+from app import create_app, db, celery
 from app.models import Task, Tag, Url
 from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
-from app import celery
 from celery.bin import worker
 from celery.bin.celery import main as celery_main
 from flask.ext.babel import Babel
@@ -28,7 +27,7 @@ manager.add_command("db", MigrateCommand)
 
 @manager.command
 def celery_worker():
-    return celery_main(['celery', 'worker', '-A app.tasks'])
+    return celery_main(['celery', 'worker', '-A app'])
 
 
 @manager.command
@@ -41,7 +40,7 @@ def test():
 
 @manager.command
 def celeryd():
-    db.init_app(app)
+    # db.init_app(app)
 
     # celery_app = current_app._get_current_object()
     celery_app = celery

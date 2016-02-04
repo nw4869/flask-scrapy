@@ -132,12 +132,12 @@ class MyCrawlSpider(CrawlSpider):
             try:
                 result = re.search(tag[1], html_doc, re.S|re.U)
                 if result is not None:
-                    print('result = ',result.group())
+                    print('result = ',result.group()[:100])
                     result = result.group()
                 else:
                     result = ''
                     print('result is none')
-                print('***********data', result)
+                print('***********data', result[:100])
             except :
                 result = ''
             # item['my_item'].append((tag[0], result.encode('utf-8')))
