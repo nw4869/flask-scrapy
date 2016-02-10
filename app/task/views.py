@@ -5,7 +5,7 @@ __author__ = 'nightwind'
 
 from flask import render_template, flash, redirect, url_for, abort
 from . import task
-from ..models import Task, Tag, Url, Item
+from ..models import Task, Tag, Url, Item, Result
 from .forms import NewTaskForm, NewTagForm
 from ..tasks import do_sth, start_crawl, start_my_crawl, start_my_crawl_dict
 from .. import db
@@ -44,7 +44,7 @@ def start(task_id):
     except:
         abort(404)
 
-    builder = MyCrawlSpiderBuilder(task.name)
+    builder = MyCrawlSpiderBuilder(task.name, task_id)
     for url in task.urls:
         if url.type == 0:
             builder.add_start_url(url.rule1)
@@ -69,33 +69,9 @@ def detail(task_id):
 
     link_rules = Url.query.filter(Url.task == task, Url.type != 0).all()
 
-    all_items = Item.query.join(Tag).filter(Tag.task == task).order_by(Item.url).all()
+    results = Result.query.filter(Result.task == task).order_by(Result.datetime).all()
 
-    # make item-dicts per url
-    last_url = ''
-    item_dicts_per_url = []
-    item_dict = {}
-    for item in all_items:
-        if last_url != item.url:
-            last_url = item.url
-            item_dict = {'url': item.url}
-            item_dicts_per_url.append(item_dict)
-        item_dict[item.tag] = item
-    # print(item_dicts_per_url)
-
-    # make item-lists per url for web page
-    item_lists_per_url = []
-    urls = []
-    for i in range(len(item_dicts_per_url)):
-        item_dict_per_url = item_dicts_per_url[i]
-        items_list = [None] * len(tags)
-        for j in range(len(tags)):
-            items_list[j] = item_dict_per_url.get(tags[j])
-        urls.append(item_dict_per_url.get('url'))
-        item_lists_per_url.append(items_list)
-    # print(item_lists_per_url)
-
-    return render_template('task/detail.html', task=task, tags=tags, item_lists_per_url=item_lists_per_url, urls=urls,
+    return render_template('task/detail.html', task=task, tags=tags, results=results,
                            start_urls=start_urls, link_rules=link_rules)
 
 

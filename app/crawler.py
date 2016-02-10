@@ -88,16 +88,18 @@ class ParserSpiderProcess1(MySpiderProcess1):
 
 
 class MyCrawlSpider(CrawlSpider):
-    def __init__(self, name=None, start_urls=None, rules=None, builder=None, *a, **kw):
+    def __init__(self, name=None, task_id=None, start_urls=None, rules=None, builder=None, *a, **kw):
         if builder is not None:
             self.name = builder.name
             self.start_urls = builder.start_urls
             self.pre_rules = builder.rules
             self.tags = builder.tags
+            self.task_id = builder.task_id
         else:
             self.name = name
             self.start_urls = start_urls
             self.pre_rules = rules
+            self.task_id = task_id
         self.__init_rules()
         super(MyCrawlSpider, self).__init__(*a, **kw)
 
@@ -124,6 +126,7 @@ class MyCrawlSpider(CrawlSpider):
 
         # TODO fix encode and regex
 
+        item['task_id'] = self.task_id
         item['url'] = response.url.encode('utf-8')
         item['my_item'] = []
         print('*********tags', self.tags)
@@ -147,12 +150,14 @@ class MyCrawlSpider(CrawlSpider):
 
 class MyItem(scrapy.Item):
     my_item = scrapy.Field()
+    task_id = scrapy.Field()
     url = scrapy.Field()
 
 
 class MyCrawlSpiderBuilder:
-    def __init__(self, name):
+    def __init__(self, name, task_id):
         self.name = name
+        self.task_id = task_id
         self.start_urls = []
         self.rules = []
         self.tags = []
@@ -172,13 +177,15 @@ class MyCrawlSpiderBuilder:
         return MyCrawlSpider(self.name, self.start_urls, self.rules)
 
     def to_dict(self):
-        return {'name': self.name, 'start_urls': self.start_urls, 'rules': self.rules, 'tags': self.tags}
+        return {'name': self.name, 'start_urls': self.start_urls, 'rules': self.rules, 'tags': self.tags,
+                'task_id': self.task_id}
 
     def from_dict(self, builder_dict):
         self.name = builder_dict['name']
         self.start_urls = builder_dict['start_urls']
         self.rules = builder_dict['rules']
         self.tags = builder_dict['tags']
+        self.task_id = builder_dict['task_id']
 
 
 if __name__ == '__main__':

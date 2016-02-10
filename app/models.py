@@ -14,6 +14,7 @@ class Task(db.Model):
     delay_ms = db.Column(db.Integer, default=-1)
     urls = db.relationship('Url', backref='task', lazy='dynamic', cascade="all, delete-orphan")
     tags = db.relationship('Tag', backref='task', lazy='dynamic', cascade="all, delete-orphan")
+    results = db.relationship('Result', backref='task', lazy='dynamic', cascade="all, delete-orphan")
 
 
 class Url(db.Model):
@@ -26,7 +27,6 @@ class Url(db.Model):
     exclude = db.Column(db.String, nullable=True)
     include = db.Column(db.String, nullable=True)
     task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
-    # task = db.relationship(Task, 'urls', backref=db.backref('task', useList=True), lazy='dynamic')
 
 
 class Tag(db.Model):
@@ -46,5 +46,15 @@ class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String, nullable=True)
-    url = db.Column(db.String)
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'))
+    result_id = db.Column(db.Integer, db.ForeignKey('results.id'))
+
+
+class Result(db.Model):
+    __tablename__ = "results"
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String)
+    datetime = db.Column(db.DateTime, default=db.func.now())
+    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
+    items = db.relationship('Item', backref='result', lazy='dynamic', cascade="all, delete-orphan")
+

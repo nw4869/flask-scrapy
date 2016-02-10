@@ -36,6 +36,6 @@ def start_my_crawl(builder):
 
 @celery.task
 def start_my_crawl_dict(builder_dict):
-    builder = MyCrawlSpiderBuilder(builder_dict['name'])
+    builder = MyCrawlSpiderBuilder(builder_dict['name'], builder_dict['task_id'])
     builder.from_dict(builder_dict)
     start_my_crawl(builder)

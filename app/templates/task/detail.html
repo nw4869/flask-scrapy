@@ -82,19 +82,20 @@
                 <th class="col-sm-2">{{ tag.name }}</th>
             {% endfor %}
             <th class="col-sm-2">来源</th>
+            <th class="col-sm-2">日期</th>
         </tr>
         </thead>
         <tbody>
 
-        {% for i in range(item_lists_per_url|count) %}
+        {% for i in range(results|count) %}
             <tr>
                 <td>{{ i + 1 }}</td>
-                {% for item in item_lists_per_url[i] %}
-                    <td>
-                        <a href="{{ url_for('task.item_detail', task_id=task.id, item_id=item.id) }}">{{ item.data[:100] if item is not none }}</a>
-                    </td>
+                {% for item in results[i].items %}
+                    <td><a href="{{ url_for('task.item_detail', task_id=task.id, item_id=item.id) }}">
+                        {{ item.data[:100] if item is not none }}</a> </td>
                 {% endfor %}
-                <td><a href="{{ urls[i] }}">{{ urls[i][:100] }}</a></td>
+                <td><a href="{{ results[i].url }}">{{ results[i].url[:100] }}</a></td>
+                <td>{{ results[i].datetime }}</td>
             </tr>
         {% endfor %}
         </tbody>
