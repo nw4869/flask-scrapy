@@ -1,9 +1,8 @@
 # coding=utf-8
-from billiard import Process
 
 __author__ = 'nightwind'
 
-from flask import render_template, flash, redirect, url_for, abort
+from flask import render_template, flash, redirect, url_for, abort, request, jsonify
 from . import task
 from ..models import Task, Tag, Url, Item, Result
 from .forms import NewTaskForm, NewTagForm
@@ -17,7 +16,7 @@ from ..crawler import MyCrawlSpider, MyCrawlSpiderBuilder
 def index():
     # start_crawl.delay('baidu', ['http://baidu.com'])
     task = do_sth.delay()
-    sleep(0.1)
+    # sleep(0.1)
     print(task.ready())
 
     print(task.status)
@@ -54,7 +53,7 @@ def start(task_id):
         builder.add_tags(tag.id, tag.rule1)
     start_my_crawl_dict.delay(builder.to_dict())
     flash(u'任务启动成功!')
-    return redirect(url_for('task.index'))
+    return redirect(request.referrer or url_for('task.index'))
 
 
 @task.route('/id/<task_id>')
@@ -72,22 +71,28 @@ def detail(task_id):
     results = Result.query.filter(Result.task == task).order_by(Result.datetime).all()
 
     return render_template('task/detail.html', task=task, tags=tags, results=results,
-                           start_urls=start_urls, link_rules=link_rules)
+                           start_urls=start_urls, link_rules=link_rules, new_tag_form=NewTagForm())
 
 
-@task.route('/id/<task_id>/new_tag', methods=['GET', 'POST'])
+@task.route('/id/<task_id>/new_tag', methods=['POST'])
 def new_tag(task_id):
     if Task.query.filter(Task.id == task_id).count() != 1:
         abort(404)
 
     form = NewTagForm()
     if form.validate_on_submit():
-        tag = Tag(name=form.name.data, rule1=form.rule1.data, task_id=task_id)
+        tag = Tag(name=form.name.data, rule1=form.rule1.data, task_id=task_id, type=form.type.data)
         db.session.add(tag)
         db.session.commit()
-        flash(u'添加成功!')
-        return redirect(url_for('task.detail', task_id=task_id))
-    return render_template('task/newTag.html', form=form)
+        # TODO 完善 jsonify
+        return jsonify(tag={
+            'id': tag.id,
+            'name': tag.name,
+            'type': tag.type,
+            'rule1': tag.rule1,
+            'task_id': task_id
+        })
+    return jsonify(tag=None)
 
 
 @task.route('/id/<task_id>/remove_tag/<tag_id>', methods=['GET', 'POST'])

@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% from "_formhelpers.html" import render_field, with_errors %}
 
 {% block page_content %}
     <div class="page-header">
@@ -47,7 +49,11 @@
     <hr>
 
     <table class="table table-striped">
-        <caption>标签列表</caption>
+        <caption>标签列表 &nbsp;
+            <button class="btn btn-primary btn-sm" data-toggle="modal"
+                    data-target="#add_tag_modal">添加标签
+            </button>
+        </caption>
         <thead>
         <tr>
             <th class="col-sm-1">序号</th>
@@ -56,7 +62,7 @@
             <th class="col-sm-1">操作</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="tags_list">
 
         {% for i in range(tags|count) %}
             <tr>
@@ -68,7 +74,53 @@
         {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('task.new_tag', task_id=task.id) }}">添加标签</a>
+
+    {#    添加标签模态框#}
+    <div class="modal fade" id="add_tag_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        添加标签
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="new_tag_form" action method="post" role="form" class="form-horizontal">
+                        {{ new_tag_form.csrf_token }}
+                        {# 名称 #}
+                        <div class="form-group">
+                            {{ new_tag_form.name.label(class="control-label col-sm-2") }}
+                            <div class="col-sm-4">
+                                {{ with_errors(new_tag_form.name, class="form-control") }}
+                            </div>
+                        </div>
+                        {# 类型 #}
+                        <div class="form-group">
+                            {{ new_tag_form.type.label(class="control-label col-sm-2") }}
+                            <div class="col-sm-4">
+                                {{ with_errors(new_tag_form.type, class="form-control") }}
+                            </div>
+                        </div>
+                        {#规则1#}
+                        <div class="form-group">
+                            {{ new_tag_form.rule1.label(class="control-label col-sm-2") }}
+                            <div class="col-sm-4">
+                                {{ with_errors(new_tag_form.rule1, class="form-control") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">关闭</button>
+                    {{ new_tag_form.submit(class="btn btn-primary", id="commit_add_tag") }}
+                </div>
+            </div>
+        </div>
+    </div>
 
     <hr>
 
@@ -92,7 +144,7 @@
                 <td>{{ i + 1 }}</td>
                 {% for item in results[i].items %}
                     <td><a href="{{ url_for('task.item_detail', task_id=task.id, item_id=item.id) }}">
-                        {{ item.data[:100] if item is not none }}</a> </td>
+                        {{ item.data[:100] if item is not none }}</a></td>
                 {% endfor %}
                 <td><a href="{{ results[i].url }}">{{ results[i].url[:100] }}</a></td>
                 <td>{{ results[i].datetime }}</td>
@@ -100,4 +152,46 @@
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(document).ready(function () {
+            $("#commit_add_tag").click(function () {
+                $.ajax({
+                    url: '{{ url_for('task.new_tag', task_id=task.id) }}',
+                    data: $("#new_tag_form").serialize(),
+                    type: 'POST',
+                    success: function (response) {
+                        console.log(response);
+                        var tag = response['tag'];
+                        $("#tags_list").append(new_tag(tag['id'], tag['name'], tag['rule1']));
+                        $("#add_tag_modal").modal('hide');
+                        $("#message_box").append(send_message('添加成功', 'success'))
+                    },
+                    error: function (error) {
+                        console.error(error);
+                        $("#add_tag_modal").find(".modal-body").append(send_message("添加失败", "warning"))
+                    }
+                })
+            })
+        });
+        function new_tag(id, name, rule1) {
+            return '<tr>\
+                 <td>'+id+'</td>\
+                <td>'+name+'</td>\
+                <td>'+rule1+'</td>\
+                <td><a href="\
+                {{ url_for('task.remove_tag', task_id=task.id, tag_id='') }}'+id+'">删除</a></td>\
+            </tr>'
+
+        }
+        function send_message(message, type) {
+            return '<div class="alert alert-'+type+'">\
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>'
+                    +message+
+                '</div>'
+        }
+    </script>
 {% endblock %}

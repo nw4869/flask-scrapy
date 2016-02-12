@@ -2,7 +2,7 @@ __author__ = 'nightwind'
 
 # from celery import Celery
 from app import celery
-from scrapy.crawler import CrawlerProcess, Settings
+from scrapy.crawler import CrawlerProcess, Settings, SignalManager
 from crawler import MySpiderProcess1, MyCrawlSpider, MyCrawlSpiderBuilder
 
 
@@ -31,6 +31,7 @@ def start_my_crawl(builder):
     process = CrawlerProcess(settings)
     process.crawl(MyCrawlSpider, builder=builder)
     process.start()
+    print('process.stop()')
     process.stop()
 
 

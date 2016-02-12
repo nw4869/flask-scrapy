@@ -9,6 +9,9 @@ from scrapy.linkextractors import LinkExtractor
 from billiard import Process
 import re
 
+# class MyCrawlerProcess(CrawlerProcess):
+#
+
 
 class MySpider1(scrapy.Spider):
     name = 'baidu'

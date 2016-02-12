@@ -8,35 +8,35 @@
     </div>
 
     <form action method="post" role="form" class="form-horizontal">
-        {{ form.csrf_token }}
+        {{ new_tag_form.csrf_token }}
 
         {# 名称 #}
         <div class="form-group">
-            {{ form.name.label(class="control-label col-sm-1") }}
+            {{ new_tag_form.name.label(class="control-label col-sm-1") }}
             <div class="col-sm-4">
-                {{ with_errors(form.name, class="form-control") }}
+                {{ with_errors(new_tag_form.name, class="form-control") }}
             </div>
         </div>
 
         {# 类型 #}
         <div class="form-group">
-            {{ form.type.label(class="control-label col-sm-1") }}
+            {{ new_tag_form.type.label(class="control-label col-sm-1") }}
             <div class="col-sm-4">
-                {{ with_errors(form.type, class="form-control") }}
+                {{ with_errors(new_tag_form.type, class="form-control") }}
             </div>
         </div>
 
         {#规则1#}
         <div class="form-group">
-            {{ form.rule1.label(class="control-label col-sm-1") }}
+            {{ new_tag_form.rule1.label(class="control-label col-sm-1") }}
             <div class="col-sm-4">
-                {{ with_errors(form.rule1, class="form-control") }}
+                {{ with_errors(new_tag_form.rule1, class="form-control") }}
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-sm-offset-1 col-sm-10">
-                {{ form.submit(class="btn btn-default") }}
+                {{ new_tag_form.submit(class="btn btn-default") }}
             </div>
         </div>
 

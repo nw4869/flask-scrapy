@@ -1,6 +1,7 @@
 __author__ = 'nightwind'
 
 from . import db
+import json
 
 
 class Task(db.Model):
