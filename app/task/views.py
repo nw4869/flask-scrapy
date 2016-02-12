@@ -1,4 +1,5 @@
 # coding=utf-8
+from sqlalchemy import desc
 
 __author__ = 'nightwind'
 
@@ -68,9 +69,10 @@ def detail(task_id):
 
     link_rules = Url.query.filter(Url.task == task, Url.type != 0).all()
 
-    results = Result.query.filter(Result.task == task).order_by(Result.datetime).all()
+    # results = Result.query.filter(Result.task == task).order_by(Result.datetime).all()
 
-    return render_template('task/detail.html', task=task, tags=tags, results=results,
+    return render_template('task/detail.html', task=task, tags=tags,
+                           # results=results,
                            start_urls=start_urls, link_rules=link_rules, new_tag_form=NewTagForm())
 
 
@@ -139,3 +141,37 @@ def new_task():
         # return redirect(url_for('task.new_task'))
         return redirect(url_for('task.detail', task_id=task.id))
     return render_template('task/newTask.html', form=form)
+
+
+@task.route('/id/<int:task_id>/status', methods=['GET'])
+def status(task_id):
+    return jsonify(status='completed')
+
+
+@task.route('/id/<task_id>/results')
+def results(task_id):
+    # return ''
+    results = Result.query.filter(Result.task_id == task_id).order_by(desc(Result.datetime)).all()
+    tags = Tag.query.filter(Tag.task_id == task_id).all()
+    result_list = []
+    tag_list = []
+    for result in results:
+        rst = {
+            'id': result.id,
+            'url': result.url,
+            'datetime': result.datetime,
+            'items': []
+        }
+        result_list.append(rst)
+        for item in result.items:
+            rst['items'].append({
+                'id': item.id,
+                'data': item.data,
+                'tag_id': item.tag_id,
+            })
+    for tag in tags:
+        tag_list.append({
+            'id': tag.id,
+            'name': tag.name
+        })
+    return jsonify(results=result_list, tags = tag_list)

@@ -87,6 +87,10 @@
             data-target="#add_tag_modal">添加标签
     </button>
 
+    <p></p>
+
+    <button id="btn_refresh_result" class="btn btn-primary">刷新结果</button>
+
 {% endblock %}
 
 {% block scripts %}
@@ -116,9 +120,14 @@
                         });
             });
 
-            {#            $("#btn_add_tag").click(function(){#}
-            {#                $.post('')#}
-            {#            })#}
+            $("#btn_refresh_result").click(function () {
+                pull_results(1)
+            })
         });
+        function pull_results(task_id, callback) {
+            var url = '{{ url_for("task.results", task_id=99999999) }}';
+            url = url.replace(/99999999/, task_id);
+            return  $.getJSON(url, callback);
+        }
     </script>
 {% endblock %}
