@@ -2,6 +2,11 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% from "_formhelpers.html" import render_field, with_errors %}
 
+{% block styles %}
+    {{ super() }}
+    {#    <link rel="stylesheet" href="{{ url_for('static', filename='css/my_style.css') }}">#}
+{% endblock %}
+
 {% block page_content %}
     <div class="page-header">
         <h2>{{ task.name }} &nbsp;
@@ -156,17 +161,42 @@
         {#        {% endfor %}#}
 
         </tbody>
-        <tfoot>
-        <tr>
-            <td>loading...</td>
-        </tr>
-        </tfoot>
     </table>
+
+    {#    pagination #}
+    <div class="text-center">
+        <nav>
+            <ul class="pagination">
+                <li id="previous" class="disabled">
+                    <a href="javascript:void(0);" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="#">1<span class="sr-only">(current)</span></a>
+                </li>
+                {#                <li><a href="#">2</a></li>#}
+                {#                <li><a href="#">3</a></li>#}
+                {#                <li><a href="#">4</a></li>#}
+                {#                <li><a href="#">5</a></li>#}
+                <li id="next" class="disabled">
+                    <a href="javascript:void(0);" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
     <script>
+        var current_page = {{ page | safe }};
+        var current_size = {{ size | safe }};
+        var current_num = null;
         $(document).ready(function () {
             // 设置“添加标签”按钮响应函数
             $("#commit_add_tag").click(function () {
@@ -188,9 +218,22 @@
                 })
             });
             // 设置“刷新结果”按钮响应函数
-            $("#btn_refresh_result").click(pull_and_refresh_result);
+            $("#btn_refresh_result").click(function () {
+                pull_and_render_result({{ page|safe }}, current_size)
+
+            });
             // 异步拉取任务结果
-            pull_and_refresh_result();
+            pull_and_render_result({{ page|safe }}, current_size);
+
+            // 设置分页：previous和next点击事件
+            $("li#previous").find("a").click(function () {
+                console.log('previous clicked, to:' + (current_page - 1));
+                pull_and_render_result(current_page - 1, current_size);
+            });
+            $("li#next").find("a").click(function () {
+                console.log('next clicked, to:' + (current_page + 1));
+                pull_and_render_result(current_page + 1, current_size);
+            });
         });
         function new_tag(id, name, rule1) {
             return '<tr>\
@@ -207,12 +250,14 @@
                     + message +
                     '</div>'
         }
-        function pull_results(task_id, callback) {
+        function pull_results(task_id, callback, page, size) {
+            page = page || 1;
+            size = size || 20;
             var url = '{{ url_for("task.results", task_id=99999999) }}';
             url = url.replace(/99999999/, task_id);
-            return $.getJSON(url, callback);
+            return $.getJSON(url, {page: page, size: size}, callback);
         }
-        function refresh_results(results, tags) {
+        function render_results(results, tags) {
             var resultTable = $("#result_table");
 
             {#            设置信息#}
@@ -238,25 +283,95 @@
                 $.each(result.items, function (j, item) {
                     var item_url = "{{ url_for('task.item_detail', task_id=task.id, item_id=99999999) }}"
                             .replace(/99999999/, item.id);
-                    $("<td>").append($("<a>").attr("href", item_url).text(item.data.substr(0, 100))).appendTo(row);
+                    $("<td>").append($("<a>").attr("href", item_url).text(item.data.substr(0, 120))).appendTo(row);
                 });
-                $("<td>").append($("<a>").attr("href", result.url).text(result.url.substr(0, 100))).appendTo(row);
+                $("<td>").append($("<a>").attr("href", result.url).text(result.url.substr(0, 120))).appendTo(row);
                 $("<td>").text(result.datetime).appendTo(row);
             });
         }
-        function pull_and_refresh_result() {
+        function pull_and_render_result(page, size) {
+            if (page <= 0 || (current_num && page > current_num)) {
+                return false;
+            }
+            current_page = parseInt(page);
+            current_size = size;
             var info_box = $("#result_table").find("caption > span");
             info_box.text('loading...');
             info_box.fadeIn();
             pull_results({{ task.id }}, function (result) {
-                refresh_results(result.results, result.tags);
-            })
+                {# 渲染结果 #}
+                render_results(result.results, result.tags);
+                {# 渲染分页 #}
+                render_pagination(result.page, size, result.num);
+                current_num = result.num;
+            }, page, size)
                     .fail(function () {
                         var msg = "获取任务结果失败";
                         console.error(msg);
                         info_box.text(msg);
                         $("#message_box").append(make_message(msg, 'warning'))
                     });
+        }
+        function render_pagination(page, size, num) {
+            var ul = $("nav .pagination");
+            var previous = $("li#previous");
+            var next = $("li#next");
+            // 初始化页码
+            previous.nextUntil($("#next")).remove();
+
+            // 限定10个页码
+            var limit = 10, left_count = 5;
+            var start, end;
+            if (num <= limit) {
+                start = 1;
+                end = num + 1;
+            } else {
+                if (page <= 1 + left_count) {
+                    // 靠左边
+                    start = 1;
+                    end = 10;
+                }
+                else if (num + 1 - limit + left_count < page) {
+                    // 靠右边
+                    start = num + 1 - limit;
+                    end = num + 1;
+                } else {
+                    // 中间
+                    start = page - left_count;
+                    end = page + limit - left_count
+                }
+            }
+
+            for (var i = start; i < end; i++) {
+                if (i == page) {
+                    var a = $("<a>").attr("href", "javascript:void(0);").text(i).append($("<span>").addClass("sr-only").text('(current)'));
+                    $("<li>").addClass('active').append(a).insertBefore(next);
+                } else {
+                    $("<li>").append($("<a>").attr("href", "#").text(i)).click(function () {
+                        var page_clicked = parseInt($(this).find("a").text());
+                        console.log('page clicked, to:' + page_clicked);
+                        pull_and_render_result(page_clicked, size);
+                        return false;
+                    }).insertBefore(next);
+                }
+            }
+            // 设置previous and next
+            previous.removeClass('disabled');
+            next.removeClass('disabled');
+            if (page == 1) {
+                previous.addClass('disabled');
+            }
+            if (page == num) {
+                next.addClass('disabled');
+            }
+
+        }
+        function removeHTMLTag(str) {
+            str = str.replace(/<\/?[^>]*>/g, ''); //去除HTML tag
+            str = str.replace(/\s*\n/g, '\n'); //去除行尾空白
+            //str = str.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
+            str = str.replace(/&nbsp;/ig, '');//去掉&nbsp;
+            return str;
         }
     </script>
 {% endblock %}

@@ -1,4 +1,5 @@
 # coding=utf-8
+import math
 from sqlalchemy import desc
 
 __author__ = 'nightwind'
@@ -11,6 +12,7 @@ from ..tasks import do_sth, start_crawl, start_my_crawl, start_my_crawl_dict
 from .. import db
 from time import sleep
 from ..crawler import MyCrawlSpider, MyCrawlSpiderBuilder
+from sqlalchemy import func
 
 
 @task.route('/')
@@ -59,6 +61,7 @@ def start(task_id):
 
 @task.route('/id/<task_id>')
 def detail(task_id):
+    page, size = get_page_info_from_arg()
     try:
         task = db.session.query(Task).filter(Task.id == task_id).one()
     except:
@@ -73,7 +76,8 @@ def detail(task_id):
 
     return render_template('task/detail.html', task=task, tags=tags,
                            # results=results,
-                           start_urls=start_urls, link_rules=link_rules, new_tag_form=NewTagForm())
+                           start_urls=start_urls, link_rules=link_rules, new_tag_form=NewTagForm(),
+                           page=page, size=size)
 
 
 @task.route('/id/<task_id>/new_tag', methods=['POST'])
@@ -150,15 +154,18 @@ def status(task_id):
 
 @task.route('/id/<task_id>/results')
 def results(task_id):
-    # return ''
-    results = Result.query.filter(Result.task_id == task_id).order_by(desc(Result.datetime)).all()
+    page, size = get_page_info_from_arg()
+    start, stop = (page - 1) * size, page * size
+    total = db.session.query(func.count(Result.id)).filter(Result.task_id == task_id).scalar()
+    num = int(math.ceil(float(total) / size))
+    results = Result.query.filter(Result.task_id == task_id).order_by(desc(Result.id)).slice(start, stop)
     tags = Tag.query.filter(Tag.task_id == task_id).all()
     result_list = []
     tag_list = []
     for result in results:
         rst = {
             'id': result.id,
-            'url': result.url,
+            'url': result.url if len(result.url) < 100 else result.url[:100] + '...',
             'datetime': result.datetime,
             'items': []
         }
@@ -166,7 +173,7 @@ def results(task_id):
         for item in result.items:
             rst['items'].append({
                 'id': item.id,
-                'data': item.data,
+                'data': item.data if len(item.data) < 100 else item.data[:100] + '...',
                 'tag_id': item.tag_id,
             })
     for tag in tags:
@@ -174,4 +181,17 @@ def results(task_id):
             'id': tag.id,
             'name': tag.name
         })
-    return jsonify(results=result_list, tags = tag_list)
+    return jsonify(page=page, size=size, num=num, results=result_list, tags=tag_list)
+
+
+def get_page_info_from_arg():
+    page = request.args.get('page', 1)
+    size = request.args.get('size', 20)
+    try:
+        page = int(page)
+        size = int(size)
+        if page < 1 or size < 0:
+            abort(400)
+    except:
+        abort(400)
+    return page, size
